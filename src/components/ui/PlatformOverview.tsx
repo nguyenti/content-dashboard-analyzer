@@ -1,5 +1,7 @@
 import React from 'react';
 import { Linkedin, Youtube, Instagram, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { Badge } from './badge';
 
 const platforms = [
   {
@@ -30,14 +32,18 @@ const platforms = [
 
 export function PlatformOverview() {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Overview</h3>
-      <div className="space-y-4">
-        {platforms.map((platform) => (
-          <PlatformCard key={platform.name} platform={platform} />
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Platform Overview</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {platforms.map((platform) => (
+            <PlatformCard key={platform.name} platform={platform} />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -45,22 +51,24 @@ function PlatformCard({ platform }: { platform: any }) {
   const Icon = platform.icon;
   
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg">
+    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg ${platform.color}`}>
-          <Icon size={20} />
+          <Icon className="h-5 w-5" />
         </div>
         <div>
-          <h4 className="font-medium text-gray-900">{platform.name}</h4>
-          <p className="text-sm text-gray-600">{platform.posts} posts</p>
+          <h4 className="font-medium">{platform.name}</h4>
+          <p className="text-sm text-muted-foreground">{platform.posts} posts</p>
         </div>
       </div>
       <div className="text-right">
         <div className="flex items-center gap-1">
-          <TrendingUp size={16} className="text-green-600" />
-          <span className="font-semibold text-gray-900">{platform.avgScore}</span>
+          <TrendingUp className="h-4 w-4 text-green-600" />
+          <span className="font-semibold">{platform.avgScore}</span>
         </div>
-        <p className="text-sm text-gray-600">Avg Score</p>
+        <Badge variant="secondary" className="mt-1 text-xs">
+          Avg Score
+        </Badge>
       </div>
     </div>
   );
