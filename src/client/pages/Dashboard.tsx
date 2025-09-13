@@ -6,6 +6,8 @@ import { TopPostsTable } from '../../components/ui/TopPostsTable';
 import { PlatformOverview } from '../../components/ui/PlatformOverview';
 import { Calendar, Filter } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
+import styles from './Dashboard.module.css';
 
 export function Dashboard() {
   const { data: metrics } = useQuery({
@@ -19,14 +21,14 @@ export function Dashboard() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className={styles.container}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className={styles.header}>
         <div>
-          <h1 className="text-2xl font-normal text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 text-sm mt-1">Content performance overview</p>
+          <h1 className={styles.title}>Dashboard</h1>
+          <p className={styles.subtitle}>Content performance overview</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className={styles.controls}>
           <Button variant="outline" size="sm" className="gap-2">
             <Calendar className="h-4 w-4" />
             Last 30 days
@@ -40,19 +42,43 @@ export function Dashboard() {
 
       {/* Metrics Grid */}
       <MetricsGrid metrics={metrics} />
-      
+
       {/* Charts Section */}
-      <div className="grid grid-cols-3 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2">
-          <PerformanceChart />
+      <div className={styles.chartsSection}>
+        <div className={styles.performanceChart}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance</CardTitle>
+              <CardDescription>Your content performance over the last 30 days.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PerformanceChart />
+            </CardContent>
+          </Card>
         </div>
-        <div className="xl:col-span-1">
-          <PlatformOverview />
+        <div className={styles.platformOverview}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Platform Overview</CardTitle>
+              <CardDescription>A breakdown of your top platforms.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PlatformOverview />
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Top Posts Table */}
-      <TopPostsTable posts={topPosts} />
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Posts</CardTitle>
+          <CardDescription>Your best performing posts from the last 30 days.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TopPostsTable posts={topPosts} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

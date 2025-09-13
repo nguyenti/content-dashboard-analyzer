@@ -1,0 +1,63 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 400;
+  color: #111827;
+}
+
+.subtitle {
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chartsSection {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 1280px) {
+  .chartsSection {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.performanceChart {
+  grid-column: span 2;
+}
+
+@media (min-width: 1280px) {
+  .performanceChart {
+    grid-column: span 2;
+  }
+}
+
+.platformOverview {
+  grid-column: span 1;
+}
+
+@media (min-width: 1280px) {
+  .platformOverview {
+    grid-column: span 1;
+  }
+}

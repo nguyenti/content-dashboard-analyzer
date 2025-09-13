@@ -1,0 +1,44 @@
+.noDataMessage {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 2rem;
+}
+
+.postTitle {
+  font-weight: 500;
+  color: #111827;
+}
+
+.postTitle:hover {
+  color: #2563eb;
+}
+
+.platformBadge {
+  font-size: 0.75rem;
+}
+
+.scoreDisplay {
+  font-weight: 600;
+}
+
+.engagementDisplay {
+  color: #6b7280;
+}
+
+.dateDisplay {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.externalLinkIcon {
+  height: 1rem;
+  width: 1rem;
+  margin-left: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.postTitle:hover .externalLinkIcon {
+  opacity: 1;
+}
