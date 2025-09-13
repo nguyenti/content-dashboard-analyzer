@@ -16,13 +16,11 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/*": ["./client/*"],
+      "@/components/*": ["./client/components/*"],
+      "@/utils/*": ["./client/utils/*"]
     }
   },
-  "include": ["src"],
+  "include": ["client", "server"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

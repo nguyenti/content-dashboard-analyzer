@@ -1,0 +1,195 @@
+PRISMA SCHEMA BACKUP
+Date: 2025-09-13
+Original file: prisma/schema.prisma
+
+========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model ContentPost {
+  id          String   @id @default(cuid())
+  contentId   String   @unique
+  title       String
+  content     String
+  mediaUrls   String   // JSON array as string
+  publishedAt DateTime
+  
+  // Platform info (discriminator)
+  platformId   String
+  platformType String // 'linkedin' | 'youtube' | 'instagram'
+  platformName String
+  
+  // Platform-specific metrics stored as JSON
+  metricsJson String // Serialized LinkedInMetrics | YouTubeMetrics | InstagramMetrics
+  
+  // Optional script
+  scriptId         String?
+  scriptSource     String? // 'google_doc' | 'upload'
+  scriptTitle      String?
+  scriptContent    String?
+  scriptUrl        String?
+  scriptUploadedAt DateTime?
+  
+  // Optional AI analysis
+  aiAnalysisId     String?
+  performanceScore Float?
+  strengths        String? // JSON array
+  weaknesses       String? // JSON array
+  recommendations  String? // JSON array
+  
+  // Content structure analysis (optional)
+  hookEffectiveness     Float?
+  storytellingStructure String?
+  callToActionPresence  Boolean?
+  emotionalTone         String? // JSON array
+  keyTopics             String? // JSON array
+  readabilityScore      Float?
+  visualContentRatio    Float?
+  
+  // Trend analysis (optional)
+  topPerformingElements String? // JSON array
+  emergingPatterns      String? // JSON array
+  seasonalTrends        String? // JSON array
+  audiencePreferences   String? // JSON array
+  aiGeneratedAt         DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([platformType, publishedAt])
+  @@index([performanceScore])
+}
+
+model Platform {
+  id          String   @id @default(cuid())
+  type        String   @unique // 'linkedin' | 'youtube' | 'instagram'
+  displayName String
+  isActive    Boolean  @default(true)
+  lastSyncAt  DateTime?
+  
+  // Platform-specific credentials stored as JSON
+  credentialsJson String // Serialized LinkedInPlatform | YouTubePlatform | InstagramPlatform credentials
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AnalysisPlugin {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  version     String
+  isActive    Boolean  @default(true)
+  configJson  String   // Plugin configuration as JSON
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+========================================
+
+SUPABASE SQL EQUIVALENT:
+
+-- ContentPost table
+CREATE TABLE content_posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    content_id TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    media_urls JSONB, -- JSON array
+    published_at TIMESTAMPTZ NOT NULL,
+    
+    -- Platform info
+    platform_id TEXT NOT NULL,
+    platform_type TEXT NOT NULL, -- 'linkedin' | 'youtube' | 'instagram'
+    platform_name TEXT NOT NULL,
+    
+    -- Platform-specific metrics
+    metrics JSONB, -- Serialized LinkedInMetrics | YouTubeMetrics | InstagramMetrics
+    
+    -- Optional script
+    script_id TEXT,
+    script_source TEXT, -- 'google_doc' | 'upload'
+    script_title TEXT,
+    script_content TEXT,
+    script_url TEXT,
+    script_uploaded_at TIMESTAMPTZ,
+    
+    -- Optional AI analysis
+    ai_analysis_id TEXT,
+    performance_score REAL,
+    strengths JSONB, -- JSON array
+    weaknesses JSONB, -- JSON array
+    recommendations JSONB, -- JSON array
+    
+    -- Content structure analysis
+    hook_effectiveness REAL,
+    storytelling_structure TEXT,
+    call_to_action_presence BOOLEAN,
+    emotional_tone JSONB, -- JSON array
+    key_topics JSONB, -- JSON array
+    readability_score REAL,
+    visual_content_ratio REAL,
+    
+    -- Trend analysis
+    top_performing_elements JSONB, -- JSON array
+    emerging_patterns JSONB, -- JSON array
+    seasonal_trends JSONB, -- JSON array
+    audience_preferences JSONB, -- JSON array
+    ai_generated_at TIMESTAMPTZ,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes
+CREATE INDEX idx_content_posts_platform_type_published_at ON content_posts (platform_type, published_at);
+CREATE INDEX idx_content_posts_performance_score ON content_posts (performance_score);
+
+-- Platform table
+CREATE TABLE platforms (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type TEXT UNIQUE NOT NULL, -- 'linkedin' | 'youtube' | 'instagram'
+    display_name TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    last_sync_at TIMESTAMPTZ,
+    
+    -- Platform-specific credentials
+    credentials JSONB, -- Serialized platform credentials
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- AnalysisPlugin table
+CREATE TABLE analysis_plugins (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT UNIQUE NOT NULL,
+    description TEXT NOT NULL,
+    version TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    config JSONB, -- Plugin configuration
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Add updated_at triggers for automatic timestamp updates
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_content_posts_updated_at BEFORE UPDATE ON content_posts FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_platforms_updated_at BEFORE UPDATE ON platforms FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_analysis_plugins_updated_at BEFORE UPDATE ON analysis_plugins FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();

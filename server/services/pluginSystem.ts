@@ -1,13 +1,11 @@
 import { AnalysisPlugin, PluginAnalysisResult, ContentPost } from '../types';
-import { prisma } from '../server/db';
+import { db } from '../database';
 
 export class PluginSystem {
   private static plugins = new Map<string, AnalysisPlugin>();
 
   static async loadPlugins(): Promise<void> {
-    const dbPlugins = await prisma.analysisPlugin.findMany({
-      where: { isActive: true },
-    });
+    const dbPlugins = await db.getActiveAnalysisPlugins();
 
     for (const dbPlugin of dbPlugins) {
       try {
@@ -23,14 +21,12 @@ export class PluginSystem {
   }
 
   static async registerPlugin(plugin: Omit<AnalysisPlugin, 'id'>): Promise<string> {
-    const dbPlugin = await prisma.analysisPlugin.create({
-      data: {
-        name: plugin.name,
-        description: plugin.description,
-        version: plugin.version,
-        isActive: true,
-        configJson: JSON.stringify(plugin.config),
-      },
+    const dbPlugin = await db.createAnalysisPlugin({
+      name: plugin.name,
+      description: plugin.description,
+      version: plugin.version,
+      is_active: true,
+      config: plugin.config,
     });
 
     const fullPlugin: AnalysisPlugin = {
@@ -66,16 +62,13 @@ export class PluginSystem {
   }
 
   static async togglePlugin(pluginId: string, isActive: boolean): Promise<void> {
-    await prisma.analysisPlugin.update({
-      where: { id: pluginId },
-      data: { isActive },
+    await db.updateAnalysisPlugin(pluginId, {
+      is_active: isActive,
     });
 
     if (isActive) {
       // Reload plugin if activating
-      const dbPlugin = await prisma.analysisPlugin.findUnique({
-        where: { id: pluginId },
-      });
+      const dbPlugin = await db.getAnalysisPlugin(pluginId);
       if (dbPlugin) {
         const plugin = this.createPluginFromDb(dbPlugin);
         this.plugins.set(plugin.id, plugin);
@@ -87,16 +80,14 @@ export class PluginSystem {
   }
 
   private static createPluginFromDb(dbPlugin: any): AnalysisPlugin {
-    const config = JSON.parse(dbPlugin.configJson);
-    
     return {
       id: dbPlugin.id,
       name: dbPlugin.name,
       description: dbPlugin.description,
       version: dbPlugin.version,
-      isActive: dbPlugin.isActive,
-      config,
-      analyze: this.createAnalysisFunction(dbPlugin.name, config),
+      isActive: dbPlugin.is_active,
+      config: dbPlugin.config,
+      analyze: this.createAnalysisFunction(dbPlugin.name, dbPlugin.config),
     };
   }
 
