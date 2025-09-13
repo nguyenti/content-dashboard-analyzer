@@ -1,0 +1,86 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.platformCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: colors 0.2s;
+}
+
+.platformCard:hover {
+  background-color: hsl(210 40% 98% / 0.5);
+}
+
+.platformInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconContainer {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.linkedinIcon {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.youtubeIcon {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.instagramIcon {
+  background-color: #fdf2f8;
+  color: #db2777;
+}
+
+.icon {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.platformName {
+  font-weight: 500;
+}
+
+.postCount {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: hsl(215.4 16.3% 46.9%);
+}
+
+.scoreSection {
+  text-align: right;
+}
+
+.scoreContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.trendIcon {
+  height: 1rem;
+  width: 1rem;
+  color: #16a34a;
+}
+
+.score {
+  font-weight: 600;
+}
+
+.badge {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}

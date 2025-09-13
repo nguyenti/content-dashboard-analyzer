@@ -1,7 +1,7 @@
 import React from 'react';
 import { Linkedin, Youtube, Instagram, TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
+import styles from './PlatformOverview.module.css';
 
 const platforms = [
   {
@@ -30,20 +30,26 @@ const platforms = [
   }
 ];
 
+function getIconColorClass(platformName: string) {
+  switch (platformName) {
+    case 'LinkedIn':
+      return styles.linkedinIcon;
+    case 'YouTube':
+      return styles.youtubeIcon;
+    case 'Instagram':
+      return styles.instagramIcon;
+    default:
+      return '';
+  }
+}
+
 export function PlatformOverview() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Platform Overview</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {platforms.map((platform) => (
-            <PlatformCard key={platform.name} platform={platform} />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className={styles.container}>
+      {platforms.map((platform) => (
+        <PlatformCard key={platform.name} platform={platform} />
+      ))}
+    </div>
   );
 }
 
@@ -51,22 +57,22 @@ function PlatformCard({ platform }: { platform: any }) {
   const Icon = platform.icon;
   
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${platform.color}`}>
-          <Icon className="h-5 w-5" />
+    <div className={styles.platformCard}>
+      <div className={styles.platformInfo}>
+        <div className={`${styles.iconContainer} ${getIconColorClass(platform.name)}`}>
+          <Icon className={styles.icon} />
         </div>
         <div>
-          <h4 className="font-medium">{platform.name}</h4>
-          <p className="text-sm text-muted-foreground">{platform.posts} posts</p>
+          <h4 className={styles.platformName}>{platform.name}</h4>
+          <p className={styles.postCount}>{platform.posts} posts</p>
         </div>
       </div>
-      <div className="text-right">
-        <div className="flex items-center gap-1">
-          <TrendingUp className="h-4 w-4 text-green-600" />
-          <span className="font-semibold">{platform.avgScore}</span>
+      <div className={styles.scoreSection}>
+        <div className={styles.scoreContainer}>
+          <TrendingUp className={styles.trendIcon} />
+          <span className={styles.score}>{platform.avgScore}</span>
         </div>
-        <Badge variant="secondary" className="mt-1 text-xs">
+        <Badge variant="secondary" className={styles.badge}>
           Avg Score
         </Badge>
       </div>

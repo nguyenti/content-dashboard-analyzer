@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Minus, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Button } from './button';
 import { Badge } from './badge';
+import styles from './MetricsGrid.module.css';
 
 interface Metric {
   label: string;
@@ -48,8 +49,8 @@ export function MetricsGrid({ metrics = [] }: MetricsGridProps) {
   const displayMetrics = metrics.length > 0 ? metrics : selectedMetrics;
 
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className={styles.container}>
+      <div className={styles.grid}>
         {displayMetrics.map((metric, index) => (
           <MetricCard 
             key={index} 
@@ -74,25 +75,25 @@ export function MetricsGrid({ metrics = [] }: MetricsGridProps) {
             </Card>
 
             {showMetricSelector && (
-              <Card className="absolute top-full left-0 right-0 mt-2 z-10 max-h-64 overflow-y-auto shadow-lg">
-                <CardContent className="p-0">
+              <div className={styles.metricSelector}>
+                <div className={styles.selectorTitle}>Available Metrics</div>
+                <div className={styles.selectorList}>
                   {availableMetrics
                     .filter(metric => !selectedMetrics.find(m => m.label === metric.label))
                     .map((metric) => (
-                    <Button
+                    <button
                       key={metric.label}
-                      variant="ghost"
                       onClick={() => handleAddMetric(metric)}
-                      className="w-full p-3 h-auto justify-start border-b last:border-b-0 rounded-none"
+                      className={styles.selectorItem}
                     >
-                      <div className="text-left">
-                        <p className="font-medium">{metric.label}</p>
-                        <p className="text-sm text-muted-foreground">{metric.value}</p>
+                      <div>
+                        <p className={styles.selectorItemLabel}>{metric.label}</p>
+                        <p className={styles.selectorItemValue}>{metric.value}</p>
                       </div>
-                    </Button>
+                    </button>
                   ))}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -104,9 +105,9 @@ export function MetricsGrid({ metrics = [] }: MetricsGridProps) {
 function MetricCard({ metric, onRemove }: { metric: Metric; onRemove?: () => void }) {
   const getTrendIcon = () => {
     switch (metric.trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'down': return <TrendingDown className="h-4 w-4 text-red-600" />;
-      default: return <Minus className="h-4 w-4 text-muted-foreground" />;
+      case 'up': return <TrendingUp className={`${styles.trendIcon} ${styles.trendUp}`} />;
+      case 'down': return <TrendingDown className={`${styles.trendIcon} ${styles.trendDown}`} />;
+      default: return <Minus className={`${styles.trendIcon} ${styles.trendStable}`} />;
     }
   };
 
@@ -118,30 +119,40 @@ function MetricCard({ metric, onRemove }: { metric: Metric; onRemove?: () => voi
     }
   };
 
+  const getChangeTextClass = (trend: 'up' | 'down' | 'stable') => {
+    switch (trend) {
+      case 'up': return `${styles.changeText} ${styles.changeTextUp}`;
+      case 'down': return `${styles.changeText} ${styles.changeTextDown}`;
+      default: return `${styles.changeText} ${styles.changeTextStable}`;
+    }
+  };
+
   return (
-    <Card className="group relative hover:shadow-md transition-all duration-200">
+    <Card className={styles.metricCard}>
       {onRemove && (
         <Button
           variant="ghost"
           size="sm"
           onClick={onRemove}
-          className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          className={styles.removeButton}
         >
           <span className="sr-only">Remove metric</span>
           ×
         </Button>
       )}
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className={styles.metricHeader}>
+        <CardTitle className={styles.metricTitle}>
           {metric.label}
         </CardTitle>
         {getTrendIcon()}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{metric.value}</div>
-        <Badge variant={getTrendBadgeVariant() as any} className="mt-2 text-xs">
-          {metric.change > 0 ? '+' : ''}{metric.change}% from last month
-        </Badge>
+        <div className={styles.metricValue}>{metric.value}</div>
+        <div className={styles.metricChange}>
+          <span className={getChangeTextClass(metric.trend)}>
+            {metric.change > 0 ? '+' : ''}{metric.change}% from last month
+          </span>
+        </div>
       </CardContent>
     </Card>
   );

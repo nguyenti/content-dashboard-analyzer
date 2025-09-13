@@ -1,0 +1,236 @@
+// Layout component styles
+.layout {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.main {
+  padding: 1.5rem;
+}
+
+// Header styles
+.header {
+  display: flex;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.headerContent {
+  display: flex;
+  width: 100%;
+}
+
+// Brand section styles
+.brandSection {
+  padding: 1rem;
+  background-color: #93c5fd;
+  
+  .brandText {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    color: #1f2937;
+    font-weight: 400;
+  }
+}
+
+// Search section styles
+.searchSection {
+  padding: 1rem;
+  background-color: #fca5a5;
+  display: flex;
+  align-items: center;
+  
+  input {
+    margin-left: 0.5rem;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    
+    &::placeholder {
+      color: #6b7280;
+    }
+  }
+}
+
+// Logo section styles
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  
+  .logoGradient {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(to right, #3b82f6, #ef4444, #eab308, #22c55e);
+  }
+  
+  .logoText {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    color: #1f2937;
+    font-weight: 400;
+  }
+}
+
+// Navigation styles
+.nav {
+  display: none;
+  gap: 1rem;
+  
+  @media (min-width: 768px) {
+    display: flex;
+  }
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+  
+  &.active {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+  
+  &.inactive {
+    color: #6b7280;
+    
+    &:hover {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+  }
+}
+
+// Search input section
+.searchInput {
+  position: relative;
+  display: none;
+  
+  @media (min-width: 768px) {
+    display: flex;
+    align-items: center;
+  }
+  
+  .searchIcon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+  }
+  
+  input {
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    width: 16rem;
+    background-color: #f3f4f6;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #3b82f6;
+    }
+  }
+}
+
+// Action buttons
+.actionButton {
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f3f4f6;
+  }
+  
+  &.userButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    
+    .userName {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      font-weight: 500;
+      color: #374151;
+    }
+  }
+}
+
+// Mobile menu
+.mobileMenuToggle {
+  display: block;
+  
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.mobileMenu {
+  display: block;
+  
+  @media (min-width: 768px) {
+    display: none;
+  }
+  
+  .mobileNav {
+    padding: 0.5rem 0.5rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    @media (min-width: 640px) {
+      padding: 0.5rem 0.75rem 0.75rem;
+    }
+  }
+  
+  .mobileNavLink {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-decoration: none;
+    
+    &.active {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+    
+    &.inactive {
+      color: #6b7280;
+      
+      &:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+      }
+    }
+  }
+}
+
+// Bell icon color
+.bellIcon {
+  color: #4b5563;
+}
+
+// User icon color
+.userIcon {
+  color: #4b5563;
+}
