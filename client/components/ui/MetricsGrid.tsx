@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Button } from './button';
-import { Badge } from './badge';
 import styles from './MetricsGrid.module.css';
 
 interface Metric {
@@ -108,14 +107,6 @@ function MetricCard({ metric, onRemove }: { metric: Metric; onRemove?: () => voi
       case 'up': return <TrendingUp className={`${styles.trendIcon} ${styles.trendUp}`} />;
       case 'down': return <TrendingDown className={`${styles.trendIcon} ${styles.trendDown}`} />;
       default: return <Minus className={`${styles.trendIcon} ${styles.trendStable}`} />;
-    }
-  };
-
-  const getTrendBadgeVariant = () => {
-    switch (metric.trend) {
-      case 'up': return 'default';
-      case 'down': return 'destructive';
-      default: return 'secondary';
     }
   };
 

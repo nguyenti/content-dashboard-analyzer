@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './ContentManager.module.css';
 
 export function ContentManager() {

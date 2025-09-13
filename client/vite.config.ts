@@ -4,10 +4,9 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  root: './client',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './client'),
+      '@': path.resolve(__dirname, './'),
     },
   },
   server: {
@@ -15,11 +14,11 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
-    },
+        changeOrigin: true
+      }
+    }
   },
   build: {
-    outDir: '../dist',
+    outDir: './dist',
   },
 })

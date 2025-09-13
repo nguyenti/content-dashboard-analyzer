@@ -1,8 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -93,4 +95,4 @@ app.listen(PORT, () => {
   console.log(`📊 Dashboard API ready`);
 });
 
-module.exports = app;
+export default app;
