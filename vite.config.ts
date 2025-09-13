@@ -4,9 +4,10 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  root: './client',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './client'),
     },
   },
   server: {
@@ -17,5 +18,8 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  build: {
+    outDir: '../dist',
   },
 })

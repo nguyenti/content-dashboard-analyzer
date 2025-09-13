@@ -1,12 +1,12 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { MetricsGrid } from '../../components/ui/MetricsGrid';
-import { PerformanceChart } from '../../components/charts/PerformanceChart';
-import { TopPostsTable } from '../../components/ui/TopPostsTable';
-import { PlatformOverview } from '../../components/ui/PlatformOverview';
+import { MetricsGrid } from '../components/ui/MetricsGrid';
+import { PerformanceChart } from '../components/charts/PerformanceChart';
+import { TopPostsTable } from '../components/ui/TopPostsTable';
+import { PlatformOverview } from '../components/ui/PlatformOverview';
 import { Calendar, Filter } from 'lucide-react';
-import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import styles from './Dashboard.module.css';
 
 export function Dashboard() {

@@ -3,7 +3,7 @@ import { LinkedInService } from './socialMedia/linkedinService';
 import { YouTubeService } from './socialMedia/youtubeService';
 import { InstagramService } from './socialMedia/instagramService';
 import { ContentService } from './contentService';
-import { prisma } from '../server/db';
+import { db } from '../database';
 
 export class SocialMediaService {
   
@@ -45,58 +45,54 @@ export class SocialMediaService {
     }
 
     // Update platform last sync time
-    await prisma.platform.update({
-      where: { type: platformType },
-      data: { lastSyncAt: new Date() },
-    });
+    const platformForUpdate = await db.getPlatformByType(platformType);
+    if (platformForUpdate) {
+      await db.updatePlatform(platformForUpdate.id, { 
+        last_sync_at: new Date().toISOString() 
+      });
+    }
 
     return syncedPosts;
   }
 
   static async syncPostMetrics(postId: string): Promise<ContentPost> {
-    const post = await prisma.contentPost.findUnique({
-      where: { id: postId },
-    });
+    const post = await db.getContentPost(postId);
 
     if (!post) {
       throw new Error('Post not found');
     }
 
-    const platform = await this.getPlatform(post.platformType as PlatformType);
+    const platform = await this.getPlatform(post.platform_type as PlatformType);
     if (!platform) {
-      throw new Error(`Platform ${post.platformType} not configured`);
+      throw new Error(`Platform ${post.platform_type} not configured`);
     }
 
     let service: any;
     let metrics: any;
 
-    switch (post.platformType) {
+    switch (post.platform_type) {
       case 'linkedin':
         service = new LinkedInService(platform as any);
-        metrics = await service.getPostMetrics(post.contentId);
+        metrics = await service.getPostMetrics(post.content_id);
         break;
       case 'youtube':
         service = new YouTubeService(platform as any);
-        metrics = await service.getVideoMetrics(post.contentId);
+        metrics = await service.getVideoMetrics(post.content_id);
         break;
       case 'instagram':
         service = new InstagramService(platform as any);
-        metrics = await service.getPostMetrics(post.contentId);
+        metrics = await service.getPostMetrics(post.content_id);
         break;
       default:
-        throw new Error(`Unsupported platform: ${post.platformType}`);
+        throw new Error(`Unsupported platform: ${post.platform_type}`);
     }
 
     // Update post with new metrics
-    const updatedPost = await prisma.contentPost.update({
-      where: { id: postId },
-      data: {
-        metricsJson: JSON.stringify(metrics),
-        updatedAt: new Date(),
-      },
+    const updatedPost = await db.updateContentPost(postId, {
+      metrics: metrics,
     });
 
-    return ContentService['transformPrismaPost'](updatedPost);
+    return ContentService['transformSupabasePost'](updatedPost);
   }
 
   static async validatePlatformCredentials(platformType: PlatformType): Promise<boolean> {
@@ -125,23 +121,19 @@ export class SocialMediaService {
   }
 
   private static async getPlatform(platformType: PlatformType): Promise<Platform | null> {
-    const platform = await prisma.platform.findUnique({
-      where: { type: platformType },
-    });
+    const platform = await db.getPlatformByType(platformType);
 
     if (!platform) {
       return null;
     }
 
-    const credentials = JSON.parse(platform.credentialsJson);
-
     return {
       id: platform.id,
       type: platformType,
-      displayName: platform.displayName,
-      isActive: platform.isActive,
-      lastSyncAt: platform.lastSyncAt,
-      credentials,
+      displayName: platform.display_name,
+      isActive: platform.is_active,
+      lastSyncAt: platform.last_sync_at ? new Date(platform.last_sync_at) : undefined,
+      credentials: platform.credentials,
     } as Platform;
   }
 
@@ -183,9 +175,7 @@ export class SocialMediaService {
     }
 
     // Check if post already exists
-    const existingPost = await prisma.contentPost.findUnique({
-      where: { contentId },
-    });
+    const existingPost = await db.getContentPostByContentId(contentId);
 
     if (existingPost) {
       // Update metrics only
@@ -193,15 +183,11 @@ export class SocialMediaService {
         await service.getPostMetrics(contentId) : 
         { likes: 0, comments: 0, shares: 0, engagementRate: 0 };
 
-      const updatedPost = await prisma.contentPost.update({
-        where: { contentId },
-        data: {
-          metricsJson: JSON.stringify(metrics),
-          updatedAt: new Date(),
-        },
+      const updatedPost = await db.updateContentPost(existingPost.id, {
+        metrics: metrics,
       });
 
-      return ContentService['transformPrismaPost'](updatedPost);
+      return ContentService['transformSupabasePost'](updatedPost);
     } else {
       // Create new post
       const metrics = await service.getPostMetrics ? 
