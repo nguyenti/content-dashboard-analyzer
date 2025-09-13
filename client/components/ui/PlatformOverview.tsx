@@ -1,4 +1,3 @@
-import React from 'react';
 import { Linkedin, Youtube, Instagram, TrendingUp } from 'lucide-react';
 import { Badge } from './badge';
 import styles from './PlatformOverview.module.css';

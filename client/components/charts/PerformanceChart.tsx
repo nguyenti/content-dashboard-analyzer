@@ -1,7 +1,5 @@
-import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import styles from './PerformanceChart.module.css';
 
 const mockData = [
@@ -32,7 +30,7 @@ export function PerformanceChart() {
           <YAxis tick={{ fontSize: 12 }} className={styles.axisText} />
           <Tooltip 
             labelFormatter={(value) => new Date(value).toLocaleDateString()}
-            formatter={(value, name) => [value, name.charAt(0).toUpperCase() + name.slice(1)]}
+            formatter={(value, name) => [value, typeof name === 'string' ? name.charAt(0).toUpperCase() + name.slice(1) : name]}
             contentStyle={{
               backgroundColor: 'hsl(var(--card))',
               border: '1px solid hsl(var(--border))',

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MetricsGrid } from '../components/ui/MetricsGrid';
 import { PerformanceChart } from '../components/charts/PerformanceChart';
