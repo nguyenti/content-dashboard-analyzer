@@ -5,6 +5,7 @@ import { generateToken, setAuthCookie } from './middleware.ts';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const DEBUG = process.env.DEBUG === 'true';
 
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REDIRECT_URI) {
   console.warn('Google OAuth credentials not found in environment variables');
@@ -26,6 +27,16 @@ setInterval(() => {
 // Initiate OAuth flow
 export const initiateGoogleAuth = (req, res) => {
   try {
+    if (DEBUG) {
+      console.log('🚀 Initiating Google OAuth...');
+      console.log('Environment check:', {
+        hasClientId: !!GOOGLE_CLIENT_ID,
+        hasClientSecret: !!GOOGLE_CLIENT_SECRET,
+        hasRedirectUri: !!GOOGLE_REDIRECT_URI,
+        redirectUri: GOOGLE_REDIRECT_URI
+      });
+    }
+    
     // Generate random state for CSRF protection
     const state = crypto.randomBytes(32).toString('hex');
     oauthStates.set(state, { timestamp: Date.now() });
@@ -39,6 +50,9 @@ export const initiateGoogleAuth = (req, res) => {
     authUrl.searchParams.set('access_type', 'offline');
     authUrl.searchParams.set('prompt', 'select_account');
 
+    if (DEBUG) {
+      console.log('📤 Redirecting to Google:', authUrl.toString());
+    }
     res.redirect(authUrl.toString());
   } catch (error) {
     console.error('Error initiating Google OAuth:', error);
@@ -49,6 +63,10 @@ export const initiateGoogleAuth = (req, res) => {
 // Handle OAuth callback
 export const handleGoogleCallback = async (req, res) => {
   try {
+    if (DEBUG) {
+      console.log('📥 Google callback received');
+      console.log('Query params:', req.query);
+    }
     const { code, state, error: oauthError } = req.query;
 
     // Check for OAuth errors
@@ -108,6 +126,17 @@ export const handleGoogleCallback = async (req, res) => {
       return res.redirect('/login?error=profile_fetch_failed');
     }
 
+    // Check if user is allowed to register
+    const isAllowed = await db.isUserAllowed(profileData.email);
+    if (!isAllowed) {
+      console.log(`Unauthorized login attempt from: ${profileData.email}`);
+      return res.redirect('/login?error=unauthorized_email');
+    }
+
+    if (DEBUG) {
+      console.log('✅ User authorized:', profileData.email);
+    }
+
     // Create or update user in our database
     const user = await db.createOrUpdateUserFromGoogle({
       id: profileData.id,
@@ -121,6 +150,10 @@ export const handleGoogleCallback = async (req, res) => {
 
     // Set secure cookie
     setAuthCookie(res, jwtToken);
+
+    if (DEBUG) {
+      console.log('🎉 OAuth successful, redirecting to dashboard');
+    }
 
     // Redirect to dashboard
     res.redirect('/dashboard');

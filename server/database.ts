@@ -387,6 +387,52 @@ export class DatabaseService {
       });
     }
   }
+
+  // Allowed users operations
+  async isUserAllowed(email: string): Promise<boolean> {
+    const { data, error } = await supabase
+      .from('allowed_users')
+      .select('id')
+      .eq('email', email.toLowerCase())
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      console.error(`Failed to check allowed user: ${error.message}`);
+      return false;
+    }
+    
+    return !!data;
+  }
+
+  async addAllowedUser(email: string, invitedBy?: string): Promise<void> {
+    const { error } = await supabase
+      .from('allowed_users')
+      .insert({
+        email: email.toLowerCase(),
+        invited_by: invitedBy
+      });
+    
+    if (error) throw new Error(`Failed to add allowed user: ${error.message}`);
+  }
+
+  async removeAllowedUser(email: string): Promise<void> {
+    const { error } = await supabase
+      .from('allowed_users')
+      .delete()
+      .eq('email', email.toLowerCase());
+    
+    if (error) throw new Error(`Failed to remove allowed user: ${error.message}`);
+  }
+
+  async getAllowedUsers(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('allowed_users')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw new Error(`Failed to get allowed users: ${error.message}`);
+    return data || [];
+  }
 }
 
 // Export singleton instance

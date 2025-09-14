@@ -46,14 +46,17 @@ app.get('/auth/google/callback', handleGoogleCallback);
 
 // Redirect routes (redirect to frontend)
 app.get('/dashboard', (req, res) => {
-  res.redirect('http://localhost:3000/dashboard');
+  // Use the same origin as the request
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  res.redirect(`${baseUrl}/dashboard`);
 });
 
 app.get('/login', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
   const error = req.query.error;
   const redirectUrl = error 
-    ? `http://localhost:3000/login?error=${error}`
-    : 'http://localhost:3000/login';
+    ? `${baseUrl}/login?error=${error}`
+    : `${baseUrl}/login`;
   res.redirect(redirectUrl);
 });
 
