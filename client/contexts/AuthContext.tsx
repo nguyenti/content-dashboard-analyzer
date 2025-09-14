@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
+const DEBUG = import.meta.env.VITE_DEBUG === 'true';
+
 interface User {
   id: string;
   email: string;
@@ -38,19 +40,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (DEBUG) console.log('🔍 AuthProvider mounted, checking auth...');
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
     try {
+      if (DEBUG) console.log('📡 Checking auth status...');
       const response = await fetch('/api/auth/user', {
         credentials: 'include'
       });
       
+      if (DEBUG) {
+        console.log('📡 Auth check response:', {
+          status: response.status,
+          ok: response.ok,
+          url: response.url
+        });
+      }
+      
       if (response.ok) {
         const userData = await response.json();
+        if (DEBUG) console.log('✅ User authenticated:', userData.email);
         setUser(userData);
       } else {
+        if (DEBUG) console.log('❌ User not authenticated');
         setUser(null);
       }
     } catch (error) {
@@ -63,16 +77,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = () => {
     // Redirect to Google OAuth
+    if (DEBUG) {
+      console.log('🚀 Login button clicked, redirecting to Google OAuth...');
+      console.log('🔗 Redirecting to:', '/auth/google');
+    }
     window.location.href = '/auth/google';
   };
 
   const logout = async () => {
     try {
+      if (DEBUG) console.log('📤 Logging out...');
       await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include'
       });
       setUser(null);
+      if (DEBUG) console.log('✅ Logout successful, redirecting to login');
       // Redirect to login page
       window.location.href = '/login';
     } catch (error) {
