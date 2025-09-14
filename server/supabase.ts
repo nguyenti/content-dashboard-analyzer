@@ -20,7 +20,8 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 export const tables = {
   contentPosts: 'content_posts',
   platforms: 'platforms', 
-  analysisPlugins: 'analysis_plugins'
+  analysisPlugins: 'analysis_plugins',
+  users: 'users'
 } as const;
 
 // Helper types for database operations
@@ -94,5 +95,17 @@ export interface AnalysisPlugin {
   is_active: boolean;
   config: any;
   created_at: string;
+  updated_at: string;
+}
+
+export interface User {
+  id: string;
+  google_id: string;
+  email: string;
+  name?: string;
+  avatar_url?: string;
+  role: 'admin' | 'user' | 'viewer';
+  created_at: string;
+  last_login?: string;
   updated_at: string;
 }

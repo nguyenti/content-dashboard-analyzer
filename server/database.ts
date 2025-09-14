@@ -1,4 +1,5 @@
-import { supabase, tables, ContentPost, Platform, AnalysisPlugin } from './supabase';
+import { supabase, tables } from './supabase.ts';
+import type { ContentPost, Platform, AnalysisPlugin, User } from './supabase.ts';
 
 // Database service class that wraps Supabase operations
 export class DatabaseService {
@@ -284,6 +285,107 @@ export class DatabaseService {
       topPlatform,
       recentPosts
     };
+  }
+
+  // User operations for OAuth authentication
+  async createUser(data: Partial<User>): Promise<User> {
+    const { data: result, error } = await supabase
+      .from(tables.users)
+      .insert(data)
+      .select()
+      .single();
+    
+    if (error) throw new Error(`Failed to create user: ${error.message}`);
+    return result;
+  }
+
+  async getUserByGoogleId(googleId: string): Promise<User | null> {
+    const { data, error } = await supabase
+      .from(tables.users)
+      .select('*')
+      .eq('google_id', googleId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Failed to get user by Google ID: ${error.message}`);
+    }
+    
+    return data;
+  }
+
+  async getUserByEmail(email: string): Promise<User | null> {
+    const { data, error } = await supabase
+      .from(tables.users)
+      .select('*')
+      .eq('email', email)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Failed to get user by email: ${error.message}`);
+    }
+    
+    return data;
+  }
+
+  async getUserById(id: string): Promise<User | null> {
+    const { data, error } = await supabase
+      .from(tables.users)
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Failed to get user by ID: ${error.message}`);
+    }
+    
+    return data;
+  }
+
+  async updateUser(id: string, data: Partial<User>): Promise<User> {
+    const { data: result, error } = await supabase
+      .from(tables.users)
+      .update({ ...data, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw new Error(`Failed to update user: ${error.message}`);
+    return result;
+  }
+
+  async updateUserLastLogin(id: string): Promise<User> {
+    return this.updateUser(id, { 
+      last_login: new Date().toISOString() 
+    });
+  }
+
+  async createOrUpdateUserFromGoogle(googleData: {
+    id: string;
+    email: string;
+    name?: string;
+    picture?: string;
+  }): Promise<User> {
+    // Try to find existing user
+    const existingUser = await this.getUserByGoogleId(googleData.id);
+    
+    if (existingUser) {
+      // Update last login and any changed data
+      return this.updateUser(existingUser.id, {
+        name: googleData.name || existingUser.name,
+        avatar_url: googleData.picture || existingUser.avatar_url,
+        last_login: new Date().toISOString()
+      });
+    } else {
+      // Create new user
+      return this.createUser({
+        google_id: googleData.id,
+        email: googleData.email,
+        name: googleData.name,
+        avatar_url: googleData.picture,
+        role: 'user', // Default role
+        last_login: new Date().toISOString()
+      });
+    }
   }
 }
 

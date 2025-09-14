@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   BarChart3,
@@ -8,9 +8,9 @@ import {
   Menu,
   X,
   Search,
-  Bell,
-  UserCircle
+  Bell
 } from 'lucide-react';
+import { UserMenu } from '@/components/auth/UserMenu';
 import './Layout.scss';
 
 interface LayoutProps {
@@ -18,7 +18,7 @@ interface LayoutProps {
 }
 
 const navigationItems = [
-  { to: '/', icon: BarChart3, label: 'Dashboard' },
+  { to: '/dashboard', icon: BarChart3, label: 'Dashboard' },
   { to: '/analytics', icon: TrendingUp, label: 'Analytics' },
   { to: '/content', icon: FileText, label: 'Content' },
   { to: '/settings', icon: Settings, label: 'Settings' },
@@ -73,10 +73,7 @@ function Header() {
           <button className="actionButton">
             <Bell size={20} className="bellIcon" />
           </button>
-          <button className="actionButton userButton">
-            <UserCircle size={24} className="userIcon" />
-            <span className="userName">User</span>
-          </button>
+          <UserMenu />
           <div className="mobileMenuToggle">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -1,8 +1,15 @@
+import './config.ts';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+
+// Auth imports
+import { db } from './database.ts';
+import { initiateGoogleAuth, handleGoogleCallback, getCurrentUser } from './auth/google.ts';
+import { authenticateToken, requireUser, clearAuthCookie } from './auth/middleware.ts';
 
 dotenv.config();
 
@@ -11,7 +18,13 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://yourdomain.com'] 
+    : ['http://localhost:3000'],
+  credentials: true, // Allow cookies
+}));
+app.use(cookieParser()); // Parse cookies
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,13 +35,39 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Basic route
+// Public routes (no authentication required)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Content Dashboard API is running' });
 });
 
-// Mock API endpoints for now
-app.get('/api/metrics/overview', (req, res) => {
+// Authentication routes
+app.get('/auth/google', initiateGoogleAuth);
+app.get('/auth/google/callback', handleGoogleCallback);
+
+// Redirect routes (redirect to frontend)
+app.get('/dashboard', (req, res) => {
+  res.redirect('http://localhost:3000/dashboard');
+});
+
+app.get('/login', (req, res) => {
+  const error = req.query.error;
+  const redirectUrl = error 
+    ? `http://localhost:3000/login?error=${error}`
+    : 'http://localhost:3000/login';
+  res.redirect(redirectUrl);
+});
+
+// Get current user (requires authentication)
+app.get('/api/auth/user', authenticateToken, getCurrentUser);
+
+// Logout route
+app.post('/api/auth/logout', (req, res) => {
+  clearAuthCookie(res);
+  res.json({ message: 'Logged out successfully' });
+});
+
+// Protected API endpoints (require authentication)
+app.get('/api/metrics/overview', authenticateToken, requireUser, (req, res) => {
   res.json([
     { label: 'Total Posts', value: 142, change: 12, trend: 'up' },
     { label: 'Avg Engagement', value: 3.2, change: -0.3, trend: 'down' },
@@ -37,7 +76,7 @@ app.get('/api/metrics/overview', (req, res) => {
   ]);
 });
 
-app.get('/api/posts/top', (req, res) => {
+app.get('/api/posts/top', authenticateToken, requireUser, (req, res) => {
   const limit = parseInt(req.query.limit) || 5;
   const mockPosts = [
     {
@@ -69,7 +108,7 @@ app.get('/api/posts/top', (req, res) => {
   res.json(mockPosts.slice(0, limit));
 });
 
-app.get('/api/analytics/performance', (req, res) => {
+app.get('/api/analytics/performance', authenticateToken, requireUser, (req, res) => {
   res.json([
     { date: '2024-01-01', linkedin: 65, youtube: 80, instagram: 45 },
     { date: '2024-01-08', linkedin: 72, youtube: 85, instagram: 52 },
